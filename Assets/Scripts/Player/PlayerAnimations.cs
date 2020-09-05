@@ -5,28 +5,26 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerActions))]
 public class PlayerAnimations : MonoBehaviour
 {
-    private PlayerActions playerActions;
+    private PlayerStateManager state;
     private Animator animator;
-    private Action currentAction;
 
     private AnimatorControllerParameter[] parameters;
 
     void Start()
     {
-        playerActions = GetComponent<PlayerActions>();
+        state = GetComponent<PlayerStateManager>();
         animator = GetComponent<Animator>();
         parameters = animator.parameters;
     }
 
     void Update()
     {
-        currentAction = playerActions.currentAction;
         SetCurrentAnimation();
     }
 
     private void SetCurrentAnimation()
     {
-        switch (currentAction)
+        switch (state.action)
         {
             case Action.Move:
                 {
@@ -40,14 +38,19 @@ public class PlayerAnimations : MonoBehaviour
                 }
             case Action.Jump:
                 {
-                    Play("Jump");
+                    Play("Jump", 2.5f);
                     break;
                 }
             case Action.Crouch:
-            {
-                Play("Crouch");
-                break;
-            }
+                {
+                    Play("Crouch");
+                    break;
+                }
+            case Action.Fall:
+                {
+                    Play("Fall");
+                    break;
+                }
             default:
                 {
                     SetAllFalse();
@@ -60,6 +63,14 @@ public class PlayerAnimations : MonoBehaviour
     {
         SetAllFalse();
         SetTrue(animationName);
+        animator.speed = 1;
+    }
+
+    private void Play(string animationName, float speed)
+    {
+        SetAllFalse();
+        SetTrue(animationName);
+        animator.speed = speed;
     }
 
     private void SetTrue(string parameterName)
@@ -77,6 +88,7 @@ public class PlayerAnimations : MonoBehaviour
         foreach (AnimatorControllerParameter parameter in parameters)
         {
             animator.SetBool(parameter.name, false);
+            animator.speed = 1;
         }
     }
 }

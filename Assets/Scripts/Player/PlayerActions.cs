@@ -2,15 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Action
-{
-    Idle, Move, PrepareToJump, Jump, Crouch
-}
-public enum Direction
-{
-    Right, Left
-}
-
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PlayerRaycaster))]
 public class PlayerActions : MonoBehaviour
@@ -20,101 +11,105 @@ public class PlayerActions : MonoBehaviour
     public float jumpUpForce = 2f;
     public float jumpForwardForce = 0.5f;
 
-    [HideInInspector]
-    public Action currentAction { get; private set; }
-
-    private PlayerInput input;
-    private PlayerRaycaster raycaster;
     private Rigidbody2D rigidbody;
-    private Direction currentDirection;
+    private PlayerInput input;
+    private PlayerStateManager state;
     private Vector2 direction;
 
     void Start()
     {
         input = GetComponent<PlayerInput>();
-        raycaster = GetComponent<PlayerRaycaster>();
         rigidbody = GetComponent<Rigidbody2D>();
-        currentDirection = Direction.Right;
-        currentAction = Action.Idle;
+        state = GetComponent<PlayerStateManager>();
     }
 
     void Update()
     {
+        CheckForInput();
+    }
+
+    private void CheckForInput()
+    {
         Move();
         Jump();
         Crouch();
+        Fall();
     }
 
     private void Move()
     {
-        if (raycaster.IsGrounded())
+        if (state.emplacement == Emplacement.Ground)
         {
             if ((input.moveRight || input.moveLeft) && (!input.jumpPrepare))
             {
                 direction = input.moveRight ? Vector2.right : Vector2.left;
-                if (!raycaster.IsTouchRight() && !raycaster.IsTouchLeft())
-                {
-                    MovePlayer(direction, moveSpeed);
-                }
+                MovePlayer(direction, moveSpeed);
                 TurnRound();
-                currentAction = Action.Move;
+                state.action = Action.Move;
             }
             else if (!input.any)
             {
-                currentAction = Action.Idle;
+                state.action = Action.Idle;
             }
         }
         else
         {
-            currentAction = Action.Jump;
+            state.action = Action.Jump;
         }
     }
 
     private void Jump()
     {
-        if (raycaster.IsGrounded())
+        if (state.emplacement == Emplacement.Ground && input.any)
         {
             if (input.jumpPrepare)
             {
-                currentAction = Action.PrepareToJump;
+                state.action = Action.PrepareToJump;
             }
             else if (input.jump)
             {
-                if (input.moveRight)
-                {
-                    direction = Vector2.up + (Vector2.right * jumpForwardForce);
-                }
-                else if (input.moveLeft)
-                {
-                    direction = Vector2.up + (Vector2.left * jumpForwardForce);
-                }
-                else
-                {
-                    direction = Vector2.up;
-                }
-
+                SetJumpDirection();
                 rigidbody.AddForce(direction * jumpUpForce, ForceMode2D.Impulse);
-                currentAction = Action.Jump;
+                state.action = Action.Jump;
             }
-            else if (!input.any)
+            else
             {
-                currentAction = Action.Idle;
+                if (!input.any)
+                {
+                    state.action = Action.Idle;
+                }
             }
         }
         else
         {
-            currentAction = Action.Jump;
+            state.action = Action.Jump;
         }
     }
 
     private void Crouch()
     {
-        if (raycaster.IsGrounded())
+        if (state.emplacement == Emplacement.Ground)
         {
             if (input.crouch && !input.jumpPrepare)
             {
-                currentAction = Action.Crouch;
+                state.action = Action.Crouch;
             }
+            else
+            {
+                state.action = Action.Idle;
+            }
+        }
+    }
+
+    private void Fall()
+    {
+        if (state.emplacement == Emplacement.Air)
+        {
+            state.action = (state.action != Action.Jump) ? Action.Fall : Action.Jump;
+        }
+        else if (!input.any)
+        {
+            state.action = Action.Idle;
         }
     }
 
@@ -125,15 +120,46 @@ public class PlayerActions : MonoBehaviour
 
     private void TurnRound()
     {
-        if (currentDirection == Direction.Right && direction == Vector2.left)
+        if (state.direction == Direction.Right && direction == Vector2.left)
         {
-            transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
-            currentDirection = Direction.Left;
+            Reflect();
+            state.direction = Direction.Left;
         }
-        if (currentDirection == Direction.Left && direction == Vector2.right)
+        if (state.direction == Direction.Left && direction == Vector2.right)
         {
-            transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
-            currentDirection = Direction.Right;
+            Reflect();
+            state.direction = Direction.Right;
         }
+    }
+
+    private void Reflect()
+    {
+        ScalePlayer(-1, 1);
+    }
+
+    private void ScalePlayer(float coeffX, float coeffY)
+    {
+        transform.localScale = new Vector2(transform.localScale.x * coeffX, transform.localScale.y * coeffY);
+    }
+
+    private void SetJumpDirection()
+    {
+        if (input.moveRight)
+        {
+            SetDirection(Vector2.right * jumpForwardForce, Vector2.up);
+        }
+        else if (input.moveLeft)
+        {
+            SetDirection(Vector2.left * jumpForwardForce, Vector2.up);
+        }
+        else
+        {
+            SetDirection(Vector2.zero, Vector2.zero);
+        }
+    }
+
+    private void SetDirection(Vector2 horizontal, Vector2 vertical)
+    {
+        direction = horizontal + vertical;
     }
 }
