@@ -38,12 +38,8 @@ public class PlayerAnimations : MonoBehaviour
                 }
             case Action.Jump:
                 {
-                    Play("Jump", 2.5f);
-                    break;
-                }
-            case Action.Crouch:
-                {
-                    Play("Crouch");
+                    Play("Jump");
+                    animator.speed = 2.5f;
                     break;
                 }
             case Action.Fall:
@@ -51,9 +47,15 @@ public class PlayerAnimations : MonoBehaviour
                     Play("Fall");
                     break;
                 }
+            case Action.HangOnWall:
+                {
+                    Play("HangOnWall");
+                    break;
+                }
             default:
                 {
-                    SetAllFalse();
+                    ResetParameters();
+                    animator.speed = 1;
                     break;
                 }
         }
@@ -61,34 +63,21 @@ public class PlayerAnimations : MonoBehaviour
 
     private void Play(string animationName)
     {
-        SetAllFalse();
-        SetTrue(animationName);
-        animator.speed = 1;
+        animator.speed = 1f;
+        ResetParameters();
+        SetParameterToTrue(animationName);
     }
 
-    private void Play(string animationName, float speed)
-    {
-        SetAllFalse();
-        SetTrue(animationName);
-        animator.speed = speed;
-    }
-
-    private void SetTrue(string parameterName)
+    private void SetParameterToTrue(string parameterName)
     {
         animator.SetBool(parameterName, true);
     }
 
-    private void SetFalse(string parameterName)
-    {
-        animator.SetBool(parameterName, false);
-    }
-
-    private void SetAllFalse()
+    private void ResetParameters()
     {
         foreach (AnimatorControllerParameter parameter in parameters)
         {
             animator.SetBool(parameter.name, false);
-            animator.speed = 1;
         }
     }
 }

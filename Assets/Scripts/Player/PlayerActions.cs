@@ -6,18 +6,25 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerRaycaster))]
 public class PlayerActions : MonoBehaviour
 {
-    [Header("Player Settings")]
+    [Header("Player Settings"), Space(5)]
     public float moveSpeed = 0.5f;
     public float crouchSpeed = 0.3f;
-    public float jumpUpForce = 2.5f;
     public float jumpForwardForce = 1.25f;
+    public float jumpUpForce = 2.5f;
+    public float wallJumpForwardForce = 3f;
+    public float wallJumpUpForce = 0.5f;
+    [Header("Player Physics"), Space(5)]
+    public float wallHangTime = 10f;
 
     private Rigidbody2D rigidbody;
     private PlayerInput input;
     private PlayerStateManager state;
     private Vector2 direction;
 
-    private bool hasJumped;
+    private bool hasJumped = false;
+    private float hangingTime = 0f;
+    private float extraTime = 1f;
+    private float wallPushForce = 0.002f;
 
     void Start()
     {
@@ -26,24 +33,43 @@ public class PlayerActions : MonoBehaviour
         state = GetComponent<PlayerStateManager>();
     }
 
+    private void Update()
+    {
+        // Debug.Log($"{state.emplacement}, {state.action}");
+    }
+
     ///==============///
     /// MAIN METHODS ///
     ///==============///
 
     public void DoOnUpdate()
     {
-        if (state.emplacement == Emplacement.Ground)
+        switch (state.emplacement)
         {
-            if (state.action != Action.Lift)
+            case Emplacement.Ground:
             {
-                JumpOnSpace();
+                if (state.action != Action.Lift)
+                {
+                    JumpOnSpace();
+                }
+                break;
+            }
+            case Emplacement.Wall:
+            {
+                WallJumpOnSpace();
+                HangOutOfWall();
+                hangingTime += Time.deltaTime;
+                break;
+            }
+            case Emplacement.Air:
+            {
+                state.action = hasJumped ? Action.Jump : Action.Fall;
+                HangOnWall();
+                break;
             }
         }
-        else
-        {
-            state.action = hasJumped ? Action.Jump : Action.Fall;
-        }
     }
+
     public void DoOnFixedUpdate()
     {
         if (state.emplacement == Emplacement.Ground)
@@ -62,9 +88,9 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
-    ///===============///
-    /// ACTIONS LOGIC ///
-    ///===============///
+    ///================///
+    /// ACTION METHODS ///
+    ///================///
 
     private void BeIdle()
     {
@@ -88,10 +114,18 @@ public class PlayerActions : MonoBehaviour
             TossUpPlayer(jumpForwardForce, jumpUpForce);
         }
     }
+    private void WallJumpOnSpace()
+    {
+        if (input.lift)
+        {
+            JumpOutOfWall(Vector2.up, wallJumpForwardForce, wallJumpUpForce);
+            state.action = Action.Lift;
+        }
+    }
 
-    ///============///
-    /// MOVE LOGIC ///
-    ///============///
+    ///==============///
+    /// MOVE METHODS ///
+    ///==============///
 
     private void MovePlayer(float speed, bool turnRound)
     {
@@ -124,9 +158,9 @@ public class PlayerActions : MonoBehaviour
         transform.localScale = new Vector2(transform.localScale.x * coeffX, transform.localScale.y * coeffY);
     }
 
-    ///============///
-    /// JUMP LOGIC ///
-    ///============///
+    ///==============///
+    /// JUMP METHODS ///
+    ///==============///
 
     private void TossUpPlayer(float forwardForce, float upForce)
     {
@@ -153,5 +187,32 @@ public class PlayerActions : MonoBehaviour
     private Vector2 FoldVectors(Vector2 horizontal, Vector2 vertical)
     {
         return (horizontal + vertical);
+    }
+    private void HangOnWall()
+    {
+        if ((state.isTouchWallRight || state.isTouchWallLeft))
+        {
+            state.action = Action.HangOnWall;
+            rigidbody.constraints = RigidbodyConstraints2D.FreezePositionY;
+        }
+    }
+    private void HangOutOfWall()
+    {
+        if (hangingTime > wallHangTime)
+        {
+            JumpOutOfWall(Vector2.zero, wallPushForce, 0);
+            state.action = Action.Fall;
+        }
+    }
+    private void JumpOutOfWall(Vector2 pushVector, float horizontalForce, float verticalForce)
+    {
+        pushVector += state.isTouchWallRight ? Vector2.left : Vector2.right;
+        pushVector.x *= horizontalForce;
+        pushVector.y *= verticalForce;
+
+        rigidbody.constraints = RigidbodyConstraints2D.None;
+        rigidbody.AddForce(pushVector, ForceMode2D.Impulse);
+
+        hangingTime = 0f;
     }
 }

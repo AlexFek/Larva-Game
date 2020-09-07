@@ -12,6 +12,11 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector]
     public Emplacement emplacement;
 
+    [HideInInspector]
+    public bool isTouchWallRight;
+    [HideInInspector]
+    public bool isTouchWallLeft;
+
     private PlayerRaycaster raycaster;
 
     void Start()
@@ -24,17 +29,26 @@ public class PlayerStateManager : MonoBehaviour
     void Update()
     {
         emplacement = CheckEmplacement();
+        isTouchWallRight = raycaster.IsTouchRight();
+        isTouchWallLeft = raycaster.IsTouchLeft();
     }
 
     private Emplacement CheckEmplacement()
     {
-        return raycaster.IsGrounded() ? Emplacement.Ground : Emplacement.Air;
+        if (!raycaster.IsGrounded())
+        {
+            return (isTouchWallRight || isTouchWallLeft) ? Emplacement.Wall : Emplacement.Air;
+        }
+        else
+        {
+            return Emplacement.Ground;
+        }
     }
 }
 
 public enum Action
 {
-    Idle, Move, PrepareToJump, Lift, Jump, Crouch, Fall
+    Idle, Move, PrepareToJump, Lift, Jump, Fall, HangOnWall
 }
 public enum Direction
 {
@@ -42,6 +56,6 @@ public enum Direction
 }
 public enum Emplacement
 {
-    Ground, Air
+    Ground, Air, Wall
 }
 

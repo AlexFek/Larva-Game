@@ -24,28 +24,28 @@ public class PlayerRaycaster : MonoBehaviour
 
     public bool IsGrounded()
     {
-        float distance = (extents.x + extraLength) * 2;
-        Vector2 start = new Vector2((center.x - extents.x - extraLength), (center.y - extents.y - extraLength));
+        float distance = (extents.x - extraLength) * 2;
+        Vector2 start = new Vector2((center.x - extents.x + extraLength), (center.y - extents.y - extraLength));
         Vector2 direction = Vector2.right;
-
+        // Debug.DrawRay(start, direction * distance, Color.red);
         return IsCollide(start, direction, distance, layerMask);
     }
 
     public bool IsTouchRight()
     {
-        float distance = extents.y * 2;
-        Vector2 start = new Vector2((center.x + extents.x), (center.y + extents.y + extraLength));
+        float distance = (extents.y - extraLength) * 2;
+        Vector2 start = new Vector2((center.x + extents.x + extraLength), (center.y + extents.y - extraLength));
         Vector2 direction = Vector2.down;
-
+        // Debug.DrawRay(start, direction * distance, Color.red);
         return IsCollide(start, direction, distance, layerMask);
     }
 
     public bool IsTouchLeft()
     {
-        float distance = extents.y * 2;
-        Vector2 start = new Vector2((center.x - extents.x), (center.y + extents.y + extraLength));
+        float distance = (extents.y - extraLength) * 2;
+        Vector2 start = new Vector2((center.x - extents.x - extraLength), (center.y + extents.y - extraLength));
         Vector2 direction = Vector2.down;
-
+        // Debug.DrawRay(start, direction * distance, Color.red);
         return IsCollide(start, direction, distance, layerMask);
     }
 
