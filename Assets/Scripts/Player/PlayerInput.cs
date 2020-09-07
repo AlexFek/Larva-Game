@@ -8,8 +8,7 @@ public class PlayerInput : MonoBehaviour
     public bool moveRight { get; private set; }
     public bool moveLeft { get; private set; }
     public bool prepareToJump { get; private set; }
-    public bool jump { get; private set; }
-    public bool crouch { get; private set; }
+    public bool lift { get; private set; }
 
     void Update()
     {
@@ -17,7 +16,6 @@ public class PlayerInput : MonoBehaviour
         moveRight = Input.GetKey(KeyCode.D);
         moveLeft = Input.GetKey(KeyCode.A);
         prepareToJump = Input.GetKey(KeyCode.Space);
-        jump = Input.GetKeyUp(KeyCode.Space);
-        crouch = Input.GetKey(KeyCode.C);
+        lift = Input.GetKeyUp(KeyCode.Space);
     }
 }

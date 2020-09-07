@@ -2,28 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Action
-{
-    Idle, Move, PrepareToJump, Lift, Jump, Crouch, Fall
-}
-public enum Direction
-{
-    Right, Left
-}
-public enum Emplacement
-{
-    Ground, Air
-}
-
 [RequireComponent(typeof(PlayerActions))]
 public class PlayerStateManager : MonoBehaviour
 {
     [HideInInspector]
     public Action action;
-
     [HideInInspector]
     public Direction direction;
-
     [HideInInspector]
     public Emplacement emplacement;
 
@@ -46,3 +31,17 @@ public class PlayerStateManager : MonoBehaviour
         return raycaster.IsGrounded() ? Emplacement.Ground : Emplacement.Air;
     }
 }
+
+public enum Action
+{
+    Idle, Move, PrepareToJump, Lift, Jump, Crouch, Fall
+}
+public enum Direction
+{
+    Right, Left
+}
+public enum Emplacement
+{
+    Ground, Air
+}
+
