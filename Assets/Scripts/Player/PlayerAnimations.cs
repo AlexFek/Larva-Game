@@ -52,6 +52,11 @@ public class PlayerAnimations : MonoBehaviour
                     Play("HangOnWall");
                     break;
                 }
+            case Action.Crawl:
+                {
+                    Play("Crawl");
+                    break;
+                }
             default:
                 {
                     ResetParameters();

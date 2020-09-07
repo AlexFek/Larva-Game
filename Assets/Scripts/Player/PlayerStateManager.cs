@@ -17,11 +17,11 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector]
     public bool isTouchWallLeft;
 
-    private PlayerRaycaster raycaster;
+    private PlayerColliderPhysics colliderPhysics;
 
     void Start()
     {
-        raycaster = GetComponent<PlayerRaycaster>();
+        colliderPhysics = GetComponent<PlayerColliderPhysics>();
         direction = Direction.Right;
         action = Action.Idle;
     }
@@ -29,13 +29,13 @@ public class PlayerStateManager : MonoBehaviour
     void Update()
     {
         emplacement = CheckEmplacement();
-        isTouchWallRight = raycaster.IsTouchRight();
-        isTouchWallLeft = raycaster.IsTouchLeft();
+        isTouchWallRight = colliderPhysics.IsTouchRight();
+        isTouchWallLeft = colliderPhysics.IsTouchLeft();
     }
 
     private Emplacement CheckEmplacement()
     {
-        if (!raycaster.IsGrounded())
+        if (!colliderPhysics.IsGrounded())
         {
             return (isTouchWallRight || isTouchWallLeft) ? Emplacement.Wall : Emplacement.Air;
         }
@@ -48,7 +48,7 @@ public class PlayerStateManager : MonoBehaviour
 
 public enum Action
 {
-    Idle, Move, PrepareToJump, Lift, Jump, Fall, HangOnWall
+    Idle, Move, PrepareToJump, Lift, Jump, Fall, HangOnWall, Crawl
 }
 public enum Direction
 {

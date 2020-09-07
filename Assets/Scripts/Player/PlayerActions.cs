@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInput))]
-[RequireComponent(typeof(PlayerRaycaster))]
+[RequireComponent(typeof(PlayerColliderPhysics))]
 public class PlayerActions : MonoBehaviour
 {
-    [Header("Player Settings"), Space(5)]
+    [Header("Player Settings")]
     public float moveSpeed = 0.5f;
-    public float crouchSpeed = 0.3f;
+    [Space(10)]
     public float jumpForwardForce = 1.25f;
     public float jumpUpForce = 2.5f;
+    [Space(10)]
     public float wallJumpForwardForce = 3f;
-    public float wallJumpUpForce = 0.5f;
-    [Header("Player Physics"), Space(5)]
-    public float wallHangTime = 10f;
+    public float wallJumpUpForce = 0.7f;
+    [Space(10)]
+    public float wallHangTime = 5f;
 
     private Rigidbody2D rigidbody;
     private PlayerInput input;
     private PlayerStateManager state;
+    private PlayerColliderPhysics collider;
     private Vector2 direction;
 
     private bool hasJumped = false;
@@ -31,6 +33,7 @@ public class PlayerActions : MonoBehaviour
         input = GetComponent<PlayerInput>();
         rigidbody = GetComponent<Rigidbody2D>();
         state = GetComponent<PlayerStateManager>();
+        collider = GetComponent<PlayerColliderPhysics>();
     }
 
     private void Update()
@@ -48,7 +51,7 @@ public class PlayerActions : MonoBehaviour
         {
             case Emplacement.Ground:
             {
-                if (state.action != Action.Lift)
+                if (state.action != Action.Lift && state.action != Action.Crawl)
                 {
                     JumpOnSpace();
                 }
@@ -83,6 +86,7 @@ public class PlayerActions : MonoBehaviour
                 if ((input.moveRight || input.moveLeft) && state.action != Action.PrepareToJump)
                 {
                     MoveOnAD();
+                    // FitSizeToGap();
                 }
             }
         }
@@ -118,7 +122,7 @@ public class PlayerActions : MonoBehaviour
     {
         if (input.lift)
         {
-            JumpOutOfWall(Vector2.up, wallJumpForwardForce, wallJumpUpForce);
+            JumpOutOfWall(Vector2.down, wallJumpForwardForce, wallJumpUpForce);
             state.action = Action.Lift;
         }
     }
@@ -156,6 +160,19 @@ public class PlayerActions : MonoBehaviour
     private void ScalePlayer(float coeffX, float coeffY)
     {
         transform.localScale = new Vector2(transform.localScale.x * coeffX, transform.localScale.y * coeffY);
+    }
+    private void FitSizeToGap()
+    {
+        if ((state.isTouchWallRight || state.isTouchWallLeft))
+        {
+            state.action = Action.Crawl;
+            collider.SqueezePlayer();
+        }
+        if (!collider.IsTouchUp() && state.action == Action.Crawl)
+        {
+            state.action = Action.Move;
+            collider.ResetColliderShape();
+        }
     }
 
     ///==============///
@@ -206,6 +223,9 @@ public class PlayerActions : MonoBehaviour
     }
     private void JumpOutOfWall(Vector2 pushVector, float horizontalForce, float verticalForce)
     {
+        direction = state.isTouchWallRight ? Vector2.left : Vector2.right;
+        TurnRound();
+
         pushVector += state.isTouchWallRight ? Vector2.left : Vector2.right;
         pushVector.x *= horizontalForce;
         pushVector.y *= verticalForce;
