@@ -1238,7 +1238,7 @@ GameObject:
   m_Component:
   - component: {fileID: 328209403}
   m_Layer: 8
-  m_Name: FrontCheck
+  m_Name: FrontChecker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2384,7 +2384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 771167922}
   m_Layer: 8
-  m_Name: GroundCheck
+  m_Name: GroundChecker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5057,7 +5057,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2088724883}
   - component: {fileID: 2088724884}
+  - component: {fileID: 2088724889}
   - component: {fileID: 2088724885}
+  - component: {fileID: 2088724886}
   - component: {fileID: 2088724881}
   - component: {fileID: 2088724882}
   - component: {fileID: 2088724880}
@@ -5200,17 +5202,9 @@ MonoBehaviour:
   jumpForwardForce: 0.77
   wallJumpForwardForce: 0.78
   wallJumpUpForce: 1.92
-  groundCheck: {fileID: 771167922}
-  checkRadius: 0.04
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 512
-  frontCheck: {fileID: 328209403}
   wallSlidingSpeed: 0.12
-  action: 0
-  wallSliding: 0
-  isTouchingFront: 0
-  isGrounded: 1
+  shouldFlip: 0
+  shouldMove: 0
 --- !u!114 &2088724885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5223,6 +5217,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cd068dd25a86f04189c423517f4d8bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  regularAnimationSpeed: 1
+  jumpAnimationSpeed: 2
+--- !u!114 &2088724886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088724879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e0ec21bca168ad4a91d540f4801ac3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noInput: 0
+  moveInput: 0
+  jumpInput: 0
 --- !u!95 &2088724887
 Animator:
   serializedVersion: 3
@@ -5242,6 +5253,31 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &2088724889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088724879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44253b38aec0c3e4bbc95944c3efe837, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action: 0
+  isGrounded: 0
+  isMoving: 0
+  isJumping: 0
+  isTouchingFront: 0
+  isWallSliding: 0
+  isFacingRight: 0
+  groundChecker: {fileID: 771167922}
+  frontChecker: {fileID: 328209403}
+  checkRadius: 0.04
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!1 &2110482818
 GameObject:
   m_ObjectHideFlags: 0

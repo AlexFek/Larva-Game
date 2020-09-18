@@ -7,47 +7,30 @@ public class PlayerAnimationUpdator : MonoBehaviour {
     private float jumpAnimationSpeed = 2f;
 
     private Animator animator;
-    private PlayerController controller;
-
-    private Actions playerAction;
-    private Actions actionMove = Actions.Move;
-    private Actions actionJump = Actions.Jump;
-    private Actions actionWallSlide = Actions.WallSlide;
-
-    private bool isMoving;
-    private bool isJumping;
-    private bool isWallSliding;
+    private PlayerState state;
 
     void Start() {
-        InitVariables();
+        InitializeInstances();
     }
 
     void Update() {
-        UpdateVariables();
         UpdateAnimtion();
     }
 
     private void UpdateAnimtion() {
-        if (isMoving)
+        if (state.isMoving)
             PlayMove();
-        else if (isJumping)
+        else if (state.isJumping)
             PlayJump();
-        else if (isWallSliding)
+        else if (state.isWallSliding)
             PlayWallSlide();
         else
             PlayIdle();
     }
 
-    private void InitVariables() {
+    private void InitializeInstances() {
         animator = GetComponent<Animator>();
-        controller = GetComponent<PlayerController>();
-        playerAction = controller.action;
-    }
-
-    private void UpdateVariables() {
-        isMoving = playerAction == actionMove;
-        isJumping = playerAction == actionJump;
-        isWallSliding = playerAction == actionWallSlide;
+        state = GetComponent<PlayerState>();
     }
 
     private void PlayWallSlide() {
@@ -64,7 +47,7 @@ public class PlayerAnimationUpdator : MonoBehaviour {
     }
 
     private void PlayIdle() {
-        if (controller.isGrounded) {
+        if (state.isGrounded) {
             ResetParameters();
         }
     }
@@ -72,6 +55,11 @@ public class PlayerAnimationUpdator : MonoBehaviour {
     private void Play(string animationName) {
         ResetParameters();
         SetParamToTrue(animationName);
+    }
+
+    private void ResetParameters() {
+        SetAnimationSpeed(regularAnimationSpeed);
+        SetAllParametersToFalse();
     }
 
     private void SetAnimationSpeed(float speed) {
@@ -82,8 +70,7 @@ public class PlayerAnimationUpdator : MonoBehaviour {
         animator.SetBool(animationName, true);
     }
 
-    private void ResetParameters() {
-        SetAnimationSpeed(regularAnimationSpeed);
+    private void SetAllParametersToFalse() {
         foreach (AnimatorControllerParameter parameter in animator.parameters) {
             animator.SetBool(parameter.name, false);
         }
