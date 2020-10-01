@@ -2,44 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour {
-    public Actions action;
-    public bool isGrounded;
-    public bool isMoving;
-    public bool isJumping;
-    public bool isTouchingFront;
-    public bool isWallSliding;
-    public bool isFacingRight;
+public abstract class PlayerState : MonoBehaviour {
+    protected Player player;
 
-    [Space (10)]
-    [Header("Touch Check")]
-    public Transform groundChecker;
-    public Transform frontChecker;
-    public float checkRadius;
-    public LayerMask whatIsGround;
+    public abstract void DoAction();
+    public abstract void PlayAnimation();
 
-    void Start() {
-        SetInitialState();
+    public void SetContext(Player player) {
+        this.player = player;
     }
 
-    void Update() {
+    #region Set State Methods
+    protected void TransitionToIdle() {
+        player.TransitionTo(new PlayerStateIdle());
+    }
+    protected void TransitionToRun() {
+        player.TransitionTo(new PlayerStateRun());
+    }
+    protected void TransitionToJump() {
+        player.TransitionTo(new PlayerStateJump());
+    }
+    #endregion
 
-        UpdateState();
+    #region Animation Switch Methods
+    protected void StartAnimation(string animationName) {
+        player.animator.SetBool(animationName, true);
     }
 
-    private void SetInitialState() {
-        isFacingRight = true;
+    protected void SetAnimatorParametersToFalse() {
+        foreach(AnimatorControllerParameter parameter in player.animator.parameters) {
+            player.animator.SetBool(parameter.name, false);
+        }
     }
-
-    private void UpdateState() {
-        isMoving = action == Actions.Move;
-        isJumping = action == Actions.Jump;
-        isWallSliding = action == Actions.WallSlide;
-        isGrounded = Physics2D.OverlapCircle(groundChecker.position, checkRadius, whatIsGround);
-        isTouchingFront = Physics2D.OverlapCircle(frontChecker.position, checkRadius, whatIsGround);
-    }
-}
-
-public enum Actions {
-    Idle, Move, Jump, WallSlide, Fall
+    #endregion
 }

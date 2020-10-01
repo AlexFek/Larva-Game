@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInput : MonoBehaviour {
+public class PlayerInputReader : MonoBehaviour {
     [HideInInspector]
     public bool noInput;
     [HideInInspector]
@@ -11,12 +11,12 @@ public class PlayerInput : MonoBehaviour {
     public bool jumpInput;
 
     void Update() {
-        ListenForInput();
+        ReadInput();
     }
 
-    private void ListenForInput() {
+    private void ReadInput() {
         noInput = !Input.anyKey;
         moveInput = Input.GetAxisRaw("Horizontal");
-        jumpInput = Input.GetKeyUp(KeyCode.Space);
+        jumpInput = Input.GetKeyDown(KeyCode.Space);
     }
 }
