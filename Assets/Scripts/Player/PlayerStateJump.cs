@@ -7,7 +7,9 @@ public class PlayerStateJump : PlayerState {
         float newVelocityX = player.PlayerInput.moveInput * player.jumpForceX;
         float newVelocityY = player.jumpForceY;
 
-        Jump(newVelocityX, newVelocityY);
+        if (player.isGrounded) {
+            Jump(newVelocityX, newVelocityY);
+        }
         DoOnGrounding();
     }
 

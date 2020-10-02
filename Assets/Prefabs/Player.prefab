@@ -86,14 +86,14 @@ MonoBehaviour:
   jumpForceX: 0.49
   jumpForceY: 1.57
   isGrounded: 0
+  isTouchingFront: 0
   isFacingRight: 0
   groundChecker: {fileID: 7256021814837313957}
+  frontChecker: {fileID: 0}
   checkRadius: 0.01
   whatIsGround:
     serializedVersion: 2
     m_Bits: 512
-  checkingGrounding: 1
-  checkDistance: 0.01
   rigidbody: {fileID: 0}
   animator: {fileID: 0}
 --- !u!114 &7256021816153833089

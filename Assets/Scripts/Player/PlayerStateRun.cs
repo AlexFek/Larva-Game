@@ -9,9 +9,10 @@ public class PlayerStateRun : PlayerState {
 
         if (player.isGrounded) {
             Run(newVelocityX, newVelocityY);
-
             OnJumpKeyDown();
             OnNoInput();
+        } else {
+            TransitionToJump();
         }
     }
 
@@ -26,10 +27,7 @@ public class PlayerStateRun : PlayerState {
     }
 
     private void TurnPlayerAround() {
-        bool turnCondition = (player.isFacingRight && player.PlayerInput.moveInput < 0) ||
-                             (!player.isFacingRight && player.PlayerInput.moveInput > 0);
-
-        if (turnCondition) {
+        if ((player.isFacingRight && player.PlayerInput.moveInput < 0) || (!player.isFacingRight && player.PlayerInput.moveInput > 0)) {
             player.isFacingRight = !player.isFacingRight;
             player.transform.localScale = new Vector2(-player.transform.localScale.x, player.transform.localScale.y);
         }

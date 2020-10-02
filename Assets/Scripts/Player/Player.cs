@@ -23,9 +23,6 @@ public class Player : MonoBehaviour {
     public Transform groundChecker;
     public float checkRadius = 0.01f;
     public LayerMask whatIsGround;
-    [HideInInspector]
-    public bool checkingGrounding = true;
-    public float checkDistance = 0.01f;
     #endregion
 
     [HideInInspector]
@@ -35,7 +32,6 @@ public class Player : MonoBehaviour {
     [HideInInspector]
     public Animator animator;
     private PlayerState state;
-    private BoxCollider2D boxCollider;
 
     void Awake() {
         InitializeInstances();
@@ -56,7 +52,6 @@ public class Player : MonoBehaviour {
         rigidbody = GetComponent<Rigidbody2D>();
         state = GetComponent<PlayerState>();
         animator = GetComponent<Animator>();
-        boxCollider = GetComponent<BoxCollider2D>();
     }
 
     private void FreezePlayerRotation() {
@@ -78,9 +73,6 @@ public class Player : MonoBehaviour {
     }
 
     private void CheckGrounding() {
-        if (checkingGrounding) {
-            RaycastHit2D box = Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0, Vector2.down, checkDistance, whatIsGround);
-            isGrounded = box.collider != null;
-        }
+        isGrounded = Physics2D.OverlapCircle(groundChecker.position, checkRadius);
     }
 }
