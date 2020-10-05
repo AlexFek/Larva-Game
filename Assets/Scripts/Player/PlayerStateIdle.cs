@@ -6,13 +6,8 @@ public class PlayerStateIdle : PlayerState {
     public override void DoAction() { 
         if (player.isGrounded) {
             Stop();
-
-            if (player.PlayerInput.moveInput != 0) {
-                TransitionToRun();
-            }
-            if (player.PlayerInput.jumpInput) {
-                TransitionToJump();
-            }
+            DoOnMoveInput();
+            DoOnJumpInput();            
         } else {
             TransitionToJump();
         }
@@ -24,5 +19,17 @@ public class PlayerStateIdle : PlayerState {
 
     private void Stop() {
         player.rigidbody.velocity = new Vector2(0, player.rigidbody.velocity.y);
+    }
+
+    private void DoOnMoveInput() {
+        if (player.PlayerInput.moveInput != 0) {
+            TransitionToRun();
+        }
+    }
+
+    private void DoOnJumpInput() {
+        if (player.PlayerInput.jumpInput) {
+            TransitionToJump();
+        }
     }
 }

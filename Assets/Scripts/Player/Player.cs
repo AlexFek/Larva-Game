@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
@@ -17,12 +16,11 @@ public class Player : MonoBehaviour {
     public bool isFacingRight;
     #endregion
 
-    #region Touch Checkers
-    [Header("Touch Checkers")]
+    #region Touch Checker
+    [Header("Touch Checker")]
     [Space(10)]
-    public Transform groundChecker;
-    public float checkRadius = 0.01f;
     public LayerMask whatIsGround;
+    public float extraLength = 0.016f;
     #endregion
 
     [HideInInspector]
@@ -31,6 +29,8 @@ public class Player : MonoBehaviour {
     public Rigidbody2D rigidbody;
     [HideInInspector]
     public Animator animator;
+    [HideInInspector]
+    private BoxCollider2D boxCollider;
     private PlayerState state;
 
     void Awake() {
@@ -52,6 +52,7 @@ public class Player : MonoBehaviour {
         rigidbody = GetComponent<Rigidbody2D>();
         state = GetComponent<PlayerState>();
         animator = GetComponent<Animator>();
+        boxCollider = GetComponent<BoxCollider2D>();
     }
 
     private void FreezePlayerRotation() {
@@ -73,6 +74,7 @@ public class Player : MonoBehaviour {
     }
 
     private void CheckGrounding() {
-        isGrounded = Physics2D.OverlapCircle(groundChecker.position, checkRadius);
+        RaycastHit2D hit = Physics2D.Raycast(boxCollider.bounds.center, Vector2.down, boxCollider.bounds.extents.y + extraLength, whatIsGround);
+        isGrounded = hit.collider != null;
     }
 }
